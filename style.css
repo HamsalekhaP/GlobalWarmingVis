@@ -1,0 +1,42 @@
+/**/
+ /* .bar {
+    fill: cornflowerblue;
+  }
+
+  .bar:hover {
+    fill: pink;
+  }
+
+  div.tooltip {	
+    position: absolute;
+    background: lightsteelblue;
+	}
+
+.ixPanel {
+	border: 1px black solid;
+}*/
+/**/
+.left-panel{
+  background: teal;
+}
+.right-panel{
+  background: cyan;
+}
+.map-panel{
+  background: orange;
+}
+
+.dashboard-height{
+  height: 100vh
+}
+
+/*for mobile*/
+@media (min-width: @screen-sm-min) {
+/*@media only screen and (max-width: 768px) {*/
+
+.dashboard-height{
+  height: auto;
+  overflow: auto
+}
+
+}
