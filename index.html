@@ -1,37 +1,89 @@
 <!DOCTYPE html>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <meta charset="utf-8">
-	
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="style.css">
 
-
-  <link rel="stylesheet" href="style.css">
-
-  <body>
-
-
+<body>
+  <!--  <div class='slider-wrapper .d-none .d-sm-block .d-md-none'>
+    <input class='slider-position ' type="range" name="mySlider" id=mySlider min="1991" max="2016" value="1">
+  </div> -->
   <div class="container-fluid">
-      <div class="row dashboard-height">
-        <div class="col-sm-3 col-12 left-panel">
-          left panel rainfall graph
+    <div class="row dashboard-height">
+      <div class="col-sm-3 col-12 left-panel">
+        <svg id="rainfall"></svg>
+      </div>
+      <div class="col-sm-6 col-12 map-panel">
+        <div class='d-sm-none d-md-block slider-wrapper'>
+          <!-- <input class='slider-position' type="range" name="mySlider" id=mySlider min="1991" max="2016" value="1"> -->
+          <input class='slider-position' type="range" min="1991" max="2016" value="0" step="1" list="ticks" name="mySlider" id=mySlider>
+          <div class="ticks">
+            <span class="tick">1991</span>
+            <span class="tick">1992</span>
+            <span class="tick">1993</span>
+            <span class="tick">1994</span>
+            <span class="tick">1995</span>
+            <span class="tick">1996</span>
+            <span class="tick">1997</span>
+            <span class="tick">1998</span>
+            <span class="tick">1999</span>
+            <span class="tick">2000</span>
+            <span class="tick">2001</span>
+            <span class="tick">2002</span>
+            <span class="tick">2003</span>
+            <span class="tick">2004</span>
+            <span class="tick">2005</span>
+            <span class="tick">2006</span>
+            <span class="tick">2007</span>
+            <span class="tick">2008</span>
+            <span class="tick">2009</span>
+            <span class="tick">2010</span>
+            <span class="tick">2011</span>
+            <span class="tick">2012</span>
+            <span class="tick">2013</span>
+            <span class="tick">2014</span>
+            <span class="tick">2015</span>
+            <span class="tick">2016</span>
+          </div>
+          <!-- <datalist id="ticks">
+  <option>1991</option>
+  <option>1992</option>
+  <option>1993</option>
+  <option>1994</option>
+  <option>1995</option>
+  <option>1996</option>
+  <option>1997</option>
+  <option>1998</option>
+  <option>1999</option>
+  <option>2000</option>
+  <option>2001</option>
+  <option>2002</option>
+  <option>2003</option>
+  <option>2004</option>
+  <option>2005</option>
+  <option>2006</option>
+  <option>2007</option>
+  <option>2008</option>
+  <option>2009</option>
+  <option>2010</option>
+  <option>2011</option>
+  <option>2012</option>
+  <option>2013</option>
+  <option>2014</option>
+  <option>2015</option>
+  <option>2016</option>
+</datalist> -->
         </div>
-        
-        <div class="col-sm-6 col-12 map-panel">
-          map
-        </div>
-        <div class="col-12 col-sm-3 right-panel"> two graphs
-        </div>
+      </div>
+      <div class="col-12 col-sm-3 right-panel"> two graphs
+      </div>
     </div>
   </div>
-
-  </body>
-
-  <script type="text/javascript">
-
-  </script>
-  <script src="app.js"></script>
+</body>
+<script type="text/javascript">
+</script>
+<script src="app.js"></script>
 
 </html>
