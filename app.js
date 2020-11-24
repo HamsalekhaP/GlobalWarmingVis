@@ -1,17 +1,18 @@
 // Rainfall graph
-var rain_svg = d3.select("#rainfall");
+
+var rain_svg = d3.select('#leftish').append('svg').attr('id', 'rainfall');
+
 // data filtering
 // set from map
 var country = 'IND'
 // set from slider
 var yearOfView = '2016'
-// selected country and year's stistics
+// selected country and year's statistics
 
-// TODO: set a default
 var rainfallStats = null
 rain_svg.attr("class", "auto-width");
-d3.select("left-panel").append('h3').text('hello')
 rain_svg.style("height", "350");
+
 
 var margin = { top: 30, right: 20, bottom: 30, left: 40 };
 
@@ -54,9 +55,19 @@ g.append("text") // text label for the x axis
   .style('font-size', '12')
   .text("Month");
 
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>Rainfall(mm):</strong> <span>" + d.Rainfall + "</span>";
+    // return " <i class='fas fa-cloud-rain' style='font-size:60px;color:red'></i><span>" + d.Rainfall + "</span>";
+
+  });
+
+g.call(tip);
 
 // To DO get range from whole set or country wise
-var rainfallDataProcessing = function() {
+var rainfallDataProcessing = function(isUpdate) {
   d3.csv('./data/rainfall.csv', function(data) {
     var filterData = data.filter(function(d) {
       if (d['ISO3'] == country && d['Year'] == yearOfView) {
@@ -70,22 +81,17 @@ var rainfallDataProcessing = function() {
     y.domain([0, d3.max(filterData, function(d, i) {
       return parseFloat(d.Rainfall);
     })]);
-    drawBarChart()
+    if (isUpdate) {
+      updateChart(filterData)
+    } else {
+      drawBarChart(filterData)
+    }
   })
 };
 
 
-// var tooltip = d3.select("left-panel")
-//   .append("div")
-//   .style("width", "100")
-//   .style("position", "absolute")
-//   .style("z-index", "10")
-//   .style("visibility", "hidden")
-//   .style("background", "black")
-//   .text("a simple tooltip");
-
 // TOD check y range when exceeds height of svg
-function drawBarChart() {
+function drawBarChart(r_data) {
   x.rangeRound([0, width]);
   y.rangeRound([height, 0]);
   g.select(".axis--x")
@@ -93,14 +99,15 @@ function drawBarChart() {
     .call(d3.axisBottom(x));
   g.select(".axis--y")
     .call(d3.axisLeft(y));
-  g.selectAll('rect')
-    .data(rainfallStats)
-    .enter().append('rect')
+  g.selectAll(".rainfall_bar")
+    .data(r_data)
+    .enter().append("rect")
     .attr('class', 'rainfall_bar')
-    .attr('width', 15)
+    .attr('width', 20)
     .attr('x', function(d, i) {
       return x(d.Statistics);
     })
+    // to produce bar transition from botton instead of top
     .attr("y", function(d) {
       return y(0);
     })
@@ -117,20 +124,16 @@ function drawBarChart() {
     })
     .delay(function(d, i) { return (i * 50) });
 
-  g.selectAll('rect')
-    .on("mouseover", function(d) {
-      d3.select(this).style("fill", "red");
 
-      // tooltip.text(d);// return tooltip.style("visibility", "visible");
-    }).on("mouseout", function(d, i) {
-      d3.select(this).style("fill", "17a2b8");
-    })
+  g.selectAll('rect')
+    .on("mouseover", tip.show)
+    .on("mouseout", tip.hide)
 
 }
-rainfallDataProcessing()
+rainfallDataProcessing(false)
 
-function updateChart() {
-  y.domain([0, d3.max(rainfallStats, function(d, i) {
+function updateChart(r_data) {
+  y.domain([0, d3.max(r_data, function(d, i) {
     return parseFloat(d.Rainfall);
   })]);
   g.selectAll('rect')
@@ -145,13 +148,14 @@ function updateChart() {
     })
 }
 
-d3.select("#mySlider").on("change", function(d) {
+d3.select("#mySlider").on("change", function() {
   selectedValue = this.value
-  console.log(selectedValue)
   title.text("Rainfall Distribution in year " + selectedValue + " in " + country);
   yearOfView = selectedValue
-  rainfallDataProcessing()
-  updateChart()
+  rainfallDataProcessing(true)
+  // updateChart()
 })
+
+
 
 // Code for Rainfall graph ends here

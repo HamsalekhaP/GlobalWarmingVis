@@ -4,77 +4,53 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <body>
   <!--  <div class='slider-wrapper .d-none .d-sm-block .d-md-none'>
     <input class='slider-position ' type="range" name="mySlider" id=mySlider min="1991" max="2016" value="1">
   </div> -->
-  <div class="container-fluid">
+  <div class="container-fluid page-wrapper">
     <div class="row dashboard-height">
-      <div class="col-sm-3 col-12 left-panel">
-        <svg id="rainfall"></svg>
+      <div class="col-sm-3 col-12 left-panel" id='leftish'>
+        <!-- <svg id="rainfall"></svg> -->
       </div>
       <div class="col-sm-6 col-12 map-panel">
-        <div class='d-sm-none d-md-block slider-wrapper'>
-          <!-- <input class='slider-position' type="range" name="mySlider" id=mySlider min="1991" max="2016" value="1"> -->
-          <input class='slider-position' type="range" min="1991" max="2016" value="0" step="1" list="ticks" name="mySlider" id=mySlider>
-          <div class="ticks">
-            <span class="tick">1991</span>
-            <span class="tick">1992</span>
-            <span class="tick">1993</span>
-            <span class="tick">1994</span>
-            <span class="tick">1995</span>
-            <span class="tick">1996</span>
-            <span class="tick">1997</span>
-            <span class="tick">1998</span>
-            <span class="tick">1999</span>
-            <span class="tick">2000</span>
-            <span class="tick">2001</span>
-            <span class="tick">2002</span>
-            <span class="tick">2003</span>
-            <span class="tick">2004</span>
-            <span class="tick">2005</span>
-            <span class="tick">2006</span>
-            <span class="tick">2007</span>
-            <span class="tick">2008</span>
-            <span class="tick">2009</span>
-            <span class="tick">2010</span>
-            <span class="tick">2011</span>
-            <span class="tick">2012</span>
-            <span class="tick">2013</span>
-            <span class="tick">2014</span>
-            <span class="tick">2015</span>
-            <span class="tick">2016</span>
+        <div class='map-wrapper'></div>
+        <div class='slider-wrapper'>
+          <h4>Slide to Year</h4>
+          <input class='slider' type="range" min="1991" max="2016" value="1991" step="1" name="mySlider" id=mySlider>
+          <div class="sliderticks">
+            <p>1991</p>
+            <p>1992</p>
+            <p>1993</p>
+            <p>1994</p>
+            <p>1995</p>
+            <p>1996</p>
+            <p>1997</p>
+            <p>1998</p>
+            <p>1999</p>
+            <p>2000</p>
+            <p>2001</p>
+            <p>2002</p>
+            <p>2003</p>
+            <p>2004</p>
+            <p>2005</p>
+            <p>2006</p>
+            <p>2007</p>
+            <p>2008</p>
+            <p>2009</p>
+            <p>2010</p>
+            <p>2011</p>
+            <p>2012</p>
+            <p>2013</p>
+            <p>2014</p>
+            <p>2015</p>
+            <p>2016</p>
           </div>
-          <!-- <datalist id="ticks">
-  <option>1991</option>
-  <option>1992</option>
-  <option>1993</option>
-  <option>1994</option>
-  <option>1995</option>
-  <option>1996</option>
-  <option>1997</option>
-  <option>1998</option>
-  <option>1999</option>
-  <option>2000</option>
-  <option>2001</option>
-  <option>2002</option>
-  <option>2003</option>
-  <option>2004</option>
-  <option>2005</option>
-  <option>2006</option>
-  <option>2007</option>
-  <option>2008</option>
-  <option>2009</option>
-  <option>2010</option>
-  <option>2011</option>
-  <option>2012</option>
-  <option>2013</option>
-  <option>2014</option>
-  <option>2015</option>
-  <option>2016</option>
-</datalist> -->
         </div>
       </div>
       <div class="col-12 col-sm-3 right-panel"> two graphs
