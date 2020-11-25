@@ -14,15 +14,15 @@ body {
 }
 
 .left-panel {
-  /**/
+  margin-top: 20px;
 }
 
 .right-panel {
-  background: cyan;
+  /*background: cyan;*/
 }
 
 .map-panel {
-  background: orange;
+  /*background: orange;*/
 }
 
 .dashboard-height {
@@ -47,8 +47,17 @@ body {
 }
 
 .rainfall_bar:hover {
-  fill: orangered;
-  /*opacity: 0.6;*/
+  /*fill: orangered;*/
+  opacity: 0.9;
+}
+
+.axis {
+  /*font-weight: 600;*/
+}
+
+.axis-label {
+  font-weight: 600;
+  text-anchor: middle
 }
 
 .slider {
@@ -61,6 +70,7 @@ body {
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
+  border-radius: 25px;
 }
 
 .slider:hover {
@@ -73,7 +83,7 @@ body {
   width: 25px;
   height: 25px;
   border-radius: 30px;
-  background: #FF0000;
+  background: brown;
   cursor: pointer;
 }
 
@@ -81,7 +91,7 @@ body {
   width: 25px;
   height: 25px;
   border-radius: 25px;
-  background: #FF0000;
+  background: brown;
   cursor: pointer;
 }
 
