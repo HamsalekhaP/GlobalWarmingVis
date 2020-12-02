@@ -1,67 +1,75 @@
 // Rainfall graph
 
+var country_id_map, bounds, g, title, tip, x, y;
+
 var rain_svg = d3.select('#leftish').append('svg').attr('id', 'rainfall');
 
 // data filtering
 // set from map
-var country = 'IND'
+var country = 'IND';
 // set from slider
-var yearOfView = '1991'
+var yearOfView = '1991';
 // selected country and year's statistics
 
-var rainfallStats = null
+var rainfallStats = null;
+var margin = { top: 30, right: 20, bottom: 30, left: 40 };
+
+
 rain_svg.attr("class", "auto-width");
 rain_svg.style("height", "500");
 
 
-var margin = { top: 30, right: 20, bottom: 30, left: 40 };
+d3.json('./data/country_id_map.json', function(data) {
+  country_id_map = data;
 
-var bounds = rain_svg.node().getBoundingClientRect(),
-  width = bounds.width - margin.left - margin.right,
-  height = bounds.height - margin.top - margin.bottom,
-  x = d3.scalePoint(),
-  y = d3.scaleLinear();
+  bounds = rain_svg.node().getBoundingClientRect(),
+    width = bounds.width - margin.left - margin.right,
+    height = bounds.height - margin.top - margin.bottom,
+    x = d3.scaleBand(),
+    y = d3.scaleLinear();
 
-var g = rain_svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  g = rain_svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-g.append("g")
-  .attr("class", "axis axis--x");
+  g.append("g")
+    .attr("class", "axis axis--x");
 
-g.append("g")
-  .attr("class", "axis axis--y");
+  g.append("g")
+    .attr("class", "axis axis--y");
 
-var title = g.append("text") // Title
-  .attr("x", (width / 2))
-  .attr("y", 0 - (margin.top / 4))
-  .attr("text-anchor", "middle")
-  .style("font-size", "14px")
-  .style("text-decoration", "underline")
-  .text("Rainfall Distribution in year " + yearOfView + " in " + country);
 
-g.append("text") // text label for the y axis
-  .attr("transform", "rotate(-90)")
-  .attr("y", 0 - margin.left)
-  .attr("x", 0 - (height / 2))
-  .attr("dy", "0.71em")
-  .attr('class', 'axis-label')
-  .text("Rainfall in mm");
+  title = g.append("text") // Title
+    .attr("x", (width / 2))
+    .attr("y", 0 - (margin.top / 4))
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("text-decoration", "underline")
+    .text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[country]);
 
-g.append("text") // text label for the x axis
-  .attr("x", width / 2)
-  .attr("y", height + margin.bottom)
-  .attr('class', 'axis-label')
-  .text("Month");
+  g.append("text") // text label for the y axis
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "0.71em")
+    .attr('class', 'axis-label')
+    .text("Rainfall in mm");
 
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    return "Rainfall(mm): <span>" + d.Rainfall + "</span>";
-    // return " <i class='fas fa-cloud-rain' style='font-size:60px;color:red'></i><span>" + d.Rainfall + "</span>";
-  });
+  g.append("text") // text label for the x axis
+    .attr("x", width / 2)
+    .attr("y", height + margin.bottom)
+    .attr('class', 'axis-label')
+    .text("Month");
 
-g.call(tip);
+  tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+      return "Rainfall(mm): <span>" + d.Rainfall + "</span>";
+      // return " <i class='fas fa-cloud-rain' style='font-size:60px;color:red'></i><span>" + d.Rainfall + "</span>";
+    });
+
+  g.call(tip);
+})
 
 // To DO get range from whole set or country wise??
 var rainfallDataProcessing = function(isUpdate) {
@@ -92,6 +100,7 @@ var rainfallDataProcessing = function(isUpdate) {
 function drawBarChart(r_data) {
   x.rangeRound([0, width]);
   y.rangeRound([height, 0]);
+  x.padding([0.2]);
   g.select(".axis--x")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
@@ -101,7 +110,7 @@ function drawBarChart(r_data) {
     .data(r_data)
     .enter().append("rect")
     .attr('class', 'rainfall_bar')
-    .attr('width', 20)
+    .attr('width', x.bandwidth())
     .attr('x', function(d, i) {
       return x(d.Statistics);
     })
@@ -151,7 +160,7 @@ function updateChart(r_data) {
 
 d3.select("#mySlider").on("change", function() {
   selectedValue = this.value
-  title.text("Rainfall Distribution in year " + selectedValue + " in " + country);
+  title.text("Rainfall Distribution in year " + selectedValue + " in " + country_id_map[country]);
   yearOfView = selectedValue
   rainfallDataProcessing(true)
 })
