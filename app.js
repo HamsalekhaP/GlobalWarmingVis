@@ -1,157 +1,106 @@
-// Rainfall graph
-var rain_svg = d3.select("#rainfall");
-// data filtering
-// set from map
-var country = 'IND'
-// set from slider
-var yearOfView = '2016'
-// selected country and year's stistics
+console.log("hahahah")
+var format = d3.format(",");
 
-// TODO: set a default
-var rainfallStats = null
-rain_svg.attr("class", "auto-width");
-d3.select("left-panel").append('h3').text('hello')
-rain_svg.style("height", "350");
-
-var margin = { top: 30, right: 20, bottom: 30, left: 40 };
-
-var bounds = rain_svg.node().getBoundingClientRect(),
-  width = bounds.width - margin.left - margin.right,
-  height = bounds.height - margin.top - margin.bottom,
-  x = d3.scalePoint(),
-  y = d3.scaleLinear();
-
-var g = rain_svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-g.append("g")
-  .attr("class", "axis axis--x");
-
-g.append("g")
-  .attr("class", "axis axis--y");
-
-var title = g.append("text") // Title
-  .attr("x", (width / 2))
-  .attr("y", 0 - (margin.top / 4))
-  .attr("text-anchor", "middle")
-  .style("font-size", "14px")
-  .style("text-decoration", "underline")
-  .text("Rainfall Distribution in year " + yearOfView + " in " + country);
-
-g.append("text") // text label for the y axis
-  .attr("transform", "rotate(-90)")
-  .attr("y", 0 - margin.left)
-  .attr("x", 0 - (height / 2))
-  .attr("dy", "0.71em")
-  .style('font-size', '12')
-  .attr("text-anchor", "middle")
-  .text("Rainfall in mm");
-
-g.append("text") // text label for the x axis
-  .attr("x", width / 2)
-  .attr("y", height + margin.bottom)
-  .style("text-anchor", "middle")
-  .style('font-size', '12')
-  .text("Month");
-
-
-// To DO get range from whole set or country wise
-var rainfallDataProcessing = function() {
-  d3.csv('./data/rainfall.csv', function(data) {
-    var filterData = data.filter(function(d) {
-      if (d['ISO3'] == country && d['Year'] == yearOfView) {
-        return d
-      }
-    })
-    rainfallStats = filterData
-    x.domain(filterData.map(function(d, i) {
-      return d.Statistics;
-    }));
-    y.domain([0, d3.max(filterData, function(d, i) {
-      return parseFloat(d.Rainfall);
-    })]);
-    drawBarChart()
+// Set tooltips
+var tip = d3.tip()
+  .attr('class', 'd3-tip s')
+  .offset(function(d) {
+    if (d.properties.name === "Russia") {
+      return [-10, 200]
+    } else return [-10, 0]
   })
-};
+  .html(function(d) {
+    return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Temperature: </strong><span class='details'>" + format(d.temperature) + "</span>";
+  })
 
+// comments
+// You need to dynamically change height and width here. not by trial and error
 
-// var tooltip = d3.select("left-panel")
-//   .append("div")
-//   .style("width", "100")
-//   .style("position", "absolute")
-//   .style("z-index", "10")
-//   .style("visibility", "hidden")
-//   .style("background", "black")
-//   .text("a simple tooltip");
+var margin = { top: 0, right: 0, bottom: 0, left: 0 },
+  width = 960 - margin.left - margin.right,
+  height = 1000 - margin.top - margin.bottom;
+// width = 1920 - margin.left - margin.right,
+// height = 1000 - margin.top - margin.bottom;
 
-// TOD check y range when exceeds height of svg
-function drawBarChart() {
-  x.rangeRound([0, width]);
-  y.rangeRound([height, 0]);
-  g.select(".axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-  g.select(".axis--y")
-    .call(d3.axisLeft(y));
-  g.selectAll('rect')
-    .data(rainfallStats)
-    .enter().append('rect')
-    .attr('class', 'rainfall_bar')
-    .attr('width', 15)
-    .attr('x', function(d, i) {
-      return x(d.Statistics);
-    })
-    .attr("y", function(d) {
-      return y(0);
-    })
-    .attr("height", 0)
-    .transition()
-    .duration(800)
-    .attr('y', function(d) {
-      // console.log(height, '-', parseFloat(d.Rainfall), '=', height - parseFloat(d.Rainfall), y(parseFloat(d.Rainfall)));
-      return y(parseFloat(d.Rainfall));
-    })
-    .attr('height', function(d) {
-      // console.log(d.Rainfall, height - y(d.Rainfall));
-      return height - y(d.Rainfall);
-    })
-    .delay(function(d, i) { return (i * 50) });
+var color = d3.scaleThreshold()
+  .domain([10000, 100000, 500000, 1000000, 5000000, 10000000, 50000000, 100000000, 500000000, 1500000000])
+  .range(["rgb(247,251,255)", "rgb(222,235,247)", "rgb(198,219,239)", "rgb(158,202,225)", "rgb(107,174,214)", "rgb(66,146,198)", "rgb(33,113,181)", "rgb(8,81,156)", "rgb(8,48,107)", "rgb(3,19,43)"]);
 
-  g.selectAll('rect')
-    .on("mouseover", function(d) {
-      d3.select(this).style("fill", "red");
+var path = d3.geoPath();
+var svg = d3.select(".map-panel")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .append('g')
+  .attr('class', 'map');
 
-      // tooltip.text(d);// return tooltip.style("visibility", "visible");
-    }).on("mouseout", function(d, i) {
-      d3.select(this).style("fill", "17a2b8");
-    })
+// ranslate is bacially shifting projection width/2 pixels left and height/2 from top.
+// Considering origin as top left. IDK how the projection is being made. I think you need ot know this to adjust the sizes
 
-}
-rainfallDataProcessing()
+var projection = d3.geoMercator().scale(100)
+  .translate([width / 2, height / 2.1]);
 
-function updateChart() {
-  y.domain([0, d3.max(rainfallStats, function(d, i) {
-    return parseFloat(d.Rainfall);
-  })]);
-  g.selectAll('rect')
-    .transition()
-    .delay(function(d, i) { return i * 50; })
-    .duration(500)
-    .attr('y', function(d) {
-      return y(parseFloat(d.Rainfall));
-    })
-    .attr('height', function(d) {
-      return height - y(d.Rainfall);
-    })
+var path = d3.geoPath().projection(projection);
+svg.call(tip);
+
+queue()
+  .defer(d3.json, "world_countries.json")
+  .defer(d3.csv, "country_avg_temp.csv")
+  .await(ready);
+console.log("haha");
+
+function filterCriteria(d) {
+  //console.log(d);
+  return d.year === "1995";
 }
 
-d3.select("#mySlider").on("change", function(d) {
-  selectedValue = this.value
-  console.log(selectedValue)
-  title.text("Rainfall Distribution in year " + selectedValue + " in " + country);
-  yearOfView = selectedValue
-  rainfallDataProcessing()
-  updateChart()
-})
+function ready(error, data, temperature) {
+  var filteredTemp = temperature.filter(filterCriteria);
+  //console.log(filteredTemp);
+  var temperatureByName = {};
+  filteredTemp.forEach(function(d) { temperatureByName[d.country] = +d.temperature; });
+  data.features.forEach(function(d) { d.temperature = temperatureByName[d.properties.name] });
+  //console.log(temperatureByName);
+  console.log(data.features);
+  svg.append("g")
+    .attr("class", "countries")
+    .selectAll("path")
+    .data(data.features)
+    .enter().append("path")
+    .attr("d", path)
+    //.style("fill", function(d) { return color(populationById[d.id]); })
+    .style('stroke', 'white')
+    .style('stroke-width', 1.5)
+    .style("opacity", 0.8)
+    // tooltips
+    .style("stroke", "white")
+    .style('stroke-width', 0.3)
+    .on('mouseover', function(d) {
+      //console.log(d.geometry.coordinates[0][0][0][1]);
+      if (d.geometry.coordinates[0][0][0][1] <= 0) {
+        tip.direction('n').show(d);
+        //console.log("first one")
+      } else {
+        tip.direction('s').show(d);
+        //console.log("second")
+      }     
+      d3.select(this)
+        .style("opacity", 1)
+        .style("stroke", "white")
+        .style("stroke-width", 3);
+      })
+    .on('mouseout', function(d) {
+      tip.hide(d);
+ 
+      d3.select(this)
+        .style("opacity", 0.8)
+        .style("stroke", "white")
+        .style("stroke-width", 0.3);
+    });
 
-// Code for Rainfall graph ends here
+  svg.append("path")
+    .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
+    // .datum(topojson.mesh(data.features, function(a, b) { return a !== b; }))
+    .attr("class", "names")
+    .attr("d", path);
+}
