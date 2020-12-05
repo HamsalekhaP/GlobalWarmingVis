@@ -2,7 +2,7 @@
 
 var country_id_map, rain_bounds, rain_g, rain_title, rain_tooltip, rain_x, rain_y;
 
-var rain_svg = d3.select('#leftish').append('svg').attr('id', 'rainfall');
+var rain_svg = d3.select('#rainfall');
 
 // data filtering
 // set from map
@@ -16,7 +16,7 @@ var rain_svg_margin = { top: 30, right: 20, bottom: 30, left: 40 };
 
 
 rain_svg.attr("class", "auto-width");
-rain_svg.style("height", "500");
+rain_svg.style("height", "430");
 
 
 d3.json('./data/country_id_map.json', function(data) {

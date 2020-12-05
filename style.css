@@ -143,6 +143,26 @@ body {
   left: 0;
 }
 
+.info-wrapper {
+  margin-top: 9px;
+
+}
+
+.info-wrapper h5 {
+  padding-left: 9px;
+  font-weight: bold;
+
+}
+
+.info-wrapper ul {
+  padding-left: 18px !important;
+
+}
+
+.info-wrapper ul li {
+  text-align: justify;
+}
+
 /**/
 /*for mobile*/
 /*@media (min-width: @screen-sm-min) {*/
