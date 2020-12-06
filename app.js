@@ -162,12 +162,18 @@ function updateBarChart(r_data) {
 d3.select("#mySlider").on("change", function() {
   yearOfView = this.value
   rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
-
+  
   rainfallDataProcessing(true)
-})
 
-
+  selectedValue = this.value
+  yearOfView = selectedValue
+  queue()
+  .defer(d3.json, "world_countries.json")
+  .defer(d3.csv, "country_avg_temp.csv")
+  .await(ready);
+});
 // Code for Rainfall graph ends here
+
 var tip = d3.tip()
   .attr('class', 'd3-tip s')
   .offset(function(d) {
@@ -206,11 +212,12 @@ queue()
   .defer(d3.json, "world_countries.json")
   .defer(d3.csv, "country_avg_temp.csv")
   .await(ready);
+
 var g = svg.append("g")
   .attr("class", "legendThreshold")
   .attr("transform", "translate(20,20)");
-  .attr("class", "caption")
 g.append("text")
+  .attr("class", "caption")
   .attr("x", 0)
   .attr("y", -6)
   .text("Temperature difference (°C)");
@@ -221,15 +228,15 @@ var legend = d3.legendColor()
   .scale(color);
 svg.select(".legendThreshold")
   .call(legend);
-d3.select("#mySlider").on("change", function() {
-  selectedValue = this.value
+// d3.select("#mySlider").on("change", function() {
+//   selectedValue = this.value
+//   yearOfView = selectedValue
+//   queue()
+//   .defer(d3.json, "world_countries.json")
+//   .defer(d3.csv, "country_avg_temp.csv")
+//   .await(ready);
+// })
 
-
-  yearOfView = selectedValue
-  queue()
-  .defer(d3.json, "world_countries.json")
-  .defer(d3.csv, "country_avg_temp.csv")
-  .await(ready);
 function filterCriteria(d) {
   return d.year === yearOfView;
 }
