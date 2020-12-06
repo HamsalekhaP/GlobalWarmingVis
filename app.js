@@ -3,8 +3,8 @@ seaLevel = {
 }
 // SETUP
 // var data;
-var svg = d3.select("#vis1"),
-  margin = { top: 30, right: 20, bottom: 30, left: 40 },
+var svg_sea = d3.select("#vis1"),
+  margin_sea = { top: 30, right: 20, bottom: 30, left: 40 },
   x = d3.scaleBand().padding(0.1),
   y = d3.scaleLinear();
 
@@ -12,22 +12,22 @@ var svg = d3.select("#vis1"),
 // .domain([0, 10])
 // .rangeRound([0, 600]);
 
-var bounds = svg.node().getBoundingClientRect(),
-  width = bounds.width - margin.left - margin.right,
-  height = bounds.height - margin.top - margin.bottom;
+var bounds_sea = svg_sea.node().getBoundingClientRect(),
+  width = bounds_sea.width - margin_sea.left - margin_sea.right,
+  height = bounds_sea.height - margin_sea.top - margin_sea.bottom;
 
 
-var g = svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var g_sea = svg_sea.append("g")
+  .attr("transform", "translate(" + margin_sea.left + "," + margin_sea.top + ")");
 
-g.append("g")
+g_sea.append("g")
   .attr("class", "axis axis--x");
 
-g.append("g")
+g_sea.append("g")
   .attr("class", "axis axis--y");
 
 // label "Sea Level"
-g.append("text")
+g_sea.append("text")
   .attr("transform", "rotate(-90)")
   .attr("y", 6)
   .attr("dy", "0.71em")
@@ -35,7 +35,7 @@ g.append("text")
   .text("Global Sea Level: GMSL");
 
 // label "year"
-g.append("text")
+g_sea.append("text")
   .attr("x", width)
   .attr("y", height-20)
   .attr("dy", "0.71em")
@@ -54,11 +54,11 @@ function draw(d) {
   x.rangeRound([0, width]);
   y.rangeRound([height, 0]);
 
-  g.select(".axis--x")
+  g_sea.select(".axis--x")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
 
-  g.select(".axis--y")
+  g_sea.select(".axis--y")
     .call(d3.axisLeft(y).ticks(20));
 
   var line = d3.line()
@@ -67,7 +67,7 @@ function draw(d) {
 
   // g.data(d);
   // data = d
-  g.append("path")
+  g_sea.append("path")
     .datum(d)
     .attr("class", "line")
     .attr("stroke", "#FDC40D")
@@ -172,26 +172,26 @@ function draw(d) {
 
 
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 40};
+var margin_co2 = {top: 10, right: 30, bottom: 30, left: 40};
 
 // append the svg object to the body of the page
-var svg = d3.select("#vis2")
+var svg_co2 = d3.select("#vis2")
   .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("width", width + margin_co2.left + margin_co2.right)
+    .attr("height", height + margin_co2.top + margin_co2.bottom)
   .append("g")
     .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+          "translate(" + margin_co2.left + "," + margin_co2.top + ")");
 
     
-svg.append("text")
+svg_co2.append("text")
           .attr("x", width)
           .attr("y", height-20)
           .attr("dy", "0.71em")
           .attr("text-anchor", "end") // attribute: start, middle, end
           .text("Year");
 
-svg.append("text")
+svg_co2.append("text")
           .attr("transform", "rotate(-90)")
           .attr("y", 6)
           .attr("dy", "0.71em")
@@ -210,7 +210,7 @@ d3.csv("data/co-demo.csv", function(data) {
   var x = d3.scaleLinear()
     .domain(d3.extent(data, function(d) { return d.Year; }))
     .range([ 0, width ]);
-  svg.append("g")
+  svg_co2.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x).ticks(5));
 
@@ -218,22 +218,22 @@ d3.csv("data/co-demo.csv", function(data) {
   var y = d3.scaleLinear()
     .domain([0, d3.max(data, function(d) { return +d.emissions; })])
     .range([ height, 0 ]);
-  svg.append("g")
+  svg_co2.append("g")
     .call(d3.axisLeft(y));
 
   // color palette
   var res = sumstat.map(function(d){ return d.key }) // list of group names
-  var color = d3.scaleOrdinal()
+  var color_co2 = d3.scaleOrdinal()
     .domain(res)
     .range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
 
   // Draw the line
-  svg.selectAll(".line")
+  svg_co2.selectAll(".line")
       .data(sumstat)
       .enter()
       .append("path")
         .attr("fill", "none")
-        .attr("stroke", function(d){ return color(d.key) })
+        .attr("stroke", function(d){ return color_co2(d.key) })
         // .attr("stroke", "#63E15D")
         .attr("stroke-width", 5.5)
         .attr("d", function(d){
