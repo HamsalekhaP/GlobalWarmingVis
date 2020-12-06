@@ -242,5 +242,4 @@ d3.csv("data/co-demo.csv", function(data) {
             .y(function(d) { return y(+d.emissions); })
             (d.values)
         })
-
 })
