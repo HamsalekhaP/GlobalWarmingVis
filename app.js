@@ -159,6 +159,8 @@ function updateBarChart(r_data) {
     })
 }
 
+
+
 d3.select("#mySlider").on("change", function() {
   yearOfView = this.value
   rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
@@ -192,8 +194,8 @@ var map_tip = d3.tip()
     }
   })
 var map_margin = { top: 0, right: 0, bottom: 0, left: 0 },
-  width = 750 - map_margin.left - map_margin.right,
-  height = 720 - map_margin.top - map_margin.bottom;
+  width = 730 - map_margin.left - map_margin.right,
+  height = 600 - map_margin.top - map_margin.bottom;
 var map_color = d3.scaleThreshold()
   .domain([-100, -1, -0.5, -0.1, 0, 0.1, 1, 1.5, 2, 2.5])
   .range(["rgb(255,255,255)", "rgb(66,146,198)", "rgb(123,169,201)", "rgb(198,219,239)", "rgb(250,240,230)", "rgb(255,204,153)", "rgb(255,178,102)", "rgb(255,128,0)", "rgb(255,0,0)", "rgb(204,0,0)"])
@@ -204,7 +206,7 @@ var map_svg = d3.select(".map-wrapper")
   .attr("height", height)
   .append('g')
   .attr('class', 'map');
-var projection = d3.geoMercator().scale(90)
+var projection = d3.geoMercator().scale(100)
   .translate([width / 2, height / 2.1]);
 var path = d3.geoPath().projection(projection);
 map_svg.call(map_tip);
@@ -284,6 +286,13 @@ function ready(error, data, temperature) {
         .style("opacity", 1)
         .style("stroke", "white")
         .style("stroke-width", 3);
+    })
+    .on('click', function(d) {
+      selected_country = d['id']
+      rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
+
+      rainfallDataProcessing(true)
+
     })
     .on('mouseout', function(d) {
       map_tip.hide(d);
