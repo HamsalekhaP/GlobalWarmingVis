@@ -16,14 +16,15 @@
 	border: 1px black solid;
 }*/
 /**/
+
 .left-panel{
-  background: teal;
+  /* background: teal; */
 }
 .right-panel{
-  background: cyan;
+  /* background: cyan; */
 }
 .map-panel{
-  background: orange;
+  /* background: orange; */
 }
 
 .dashboard-height{
@@ -39,7 +40,6 @@
   overflow: auto
 }
 
-}
 
 .names {
   fill: none;
@@ -113,3 +113,5 @@
     .details{
       color:white;
     }
+
+    

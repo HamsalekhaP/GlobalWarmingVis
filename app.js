@@ -1,4 +1,5 @@
-console.log("hahahah")
+var yearOfView = '1991'
+//console.log("hahahah")
 var format = d3.format(",");
 
 // Set tooltips
@@ -10,21 +11,25 @@ var tip = d3.tip()
     } else return [-10, 0]
   })
   .html(function(d) {
-    return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Temperature: </strong><span class='details'>" + format(d.temperature) + "</span>";
+    if (isNaN(d.temperature)){
+      return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Temperature: </strong><span class='details'>" 
+    + format(d.temperature) + "<br></span>" + "<strong>Tempertature compared to 1991: </strong><span class='details'>" + format(d.difference) + "<br></span>";
+    }else{
+      return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Temperature: </strong><span class='details'>" 
+    + format(d.temperature) + "°C <br></span>" + "<strong>Tempertature compared to 1991: </strong><span class='details'>" + format(d.difference) + "°C <br></span>";
+    }    
   })
 
-// comments
-// You need to dynamically change height and width here. not by trial and error
-
 var margin = { top: 0, right: 0, bottom: 0, left: 0 },
-  width = 960 - margin.left - margin.right,
-  height = 1000 - margin.top - margin.bottom;
+  width = 900 - margin.left - margin.right,
+  height = 720 - margin.top - margin.bottom;
 // width = 1920 - margin.left - margin.right,
 // height = 1000 - margin.top - margin.bottom;
 
 var color = d3.scaleThreshold()
-  .domain([10000, 100000, 500000, 1000000, 5000000, 10000000, 50000000, 100000000, 500000000, 1500000000])
-  .range(["rgb(247,251,255)", "rgb(222,235,247)", "rgb(198,219,239)", "rgb(158,202,225)", "rgb(107,174,214)", "rgb(66,146,198)", "rgb(33,113,181)", "rgb(8,81,156)", "rgb(8,48,107)", "rgb(3,19,43)"]);
+     .domain([-100, -1, -0.5, -0.1, 0, 0.1, 1, 1.5, 2, 2.5])
+     .range(["rgb(255,255,255)", "rgb(66,146,198)", "rgb(123,169,201)", "rgb(198,219,239)", "rgb(250,240,230)", "rgb(255,204,153)", "rgb(255,178,102)", "rgb(255,128,0)", "rgb(255,0,0)", "rgb(204,0,0)"])
+     
 
 var path = d3.geoPath();
 var svg = d3.select(".map-panel")
@@ -47,28 +52,79 @@ queue()
   .defer(d3.json, "world_countries.json")
   .defer(d3.csv, "country_avg_temp.csv")
   .await(ready);
-console.log("haha");
+//console.log("haha");
+
+var g = svg.append("g")
+  .attr("class", "legendThreshold")
+  .attr("transform", "translate(20,20)");
+g.append("text")
+  .attr("class", "caption")
+  .attr("x", 0)
+  .attr("y", -6)
+  .text("Temperature difference (°C)");
+var labels = ['No data','<-1', '-1~-0.5', '-0.5~-0.1', '-0.1~0.1', '0.1~0.5', '0.5~1', '1~1.5', '1.5~2', '>2'];
+var legend = d3.legendColor()
+  .labels(function (d) { return labels[d.i]; })
+  .shapePadding(4)
+  .scale(color);
+svg.select(".legendThreshold")
+  .call(legend);
+
+d3.select("#mySlider").on("change", function() {
+  selectedValue = this.value
+  //title.text("Rainfall Distribution in year " + selectedValue + " in " + country);
+  yearOfView = selectedValue
+  queue()
+  .defer(d3.json, "world_countries.json")
+  .defer(d3.csv, "country_avg_temp.csv")
+  .await(ready);
+  //rainfallDataProcessing(true)
+})
 
 function filterCriteria(d) {
-  //console.log(d);
-  return d.year === "1995";
+  //console.log("filteredCriteria called");
+  return d.year === yearOfView;
+}
+
+function startTempFilter(d){
+  return d.year === '1991';
 }
 
 function ready(error, data, temperature) {
+  var startTemp = temperature.filter(startTempFilter);
   var filteredTemp = temperature.filter(filterCriteria);
-  //console.log(filteredTemp);
-  var temperatureByName = {};
-  filteredTemp.forEach(function(d) { temperatureByName[d.country] = +d.temperature; });
-  data.features.forEach(function(d) { d.temperature = temperatureByName[d.properties.name] });
-  //console.log(temperatureByName);
-  console.log(data.features);
+  var startTemps = {};
+  var temperatureById = {};
+  var differences = {};
+  startTemp.forEach(function(d) { startTemps[d.id] = +d.temperature; })
+  filteredTemp.forEach(function(d) { temperatureById[d.id] = +d.temperature; });
+  data.features.forEach(function(d) { d.temperature = temperatureById[d.id] });
+
+  startTemp.forEach(function(d) {
+    if (isNaN(temperatureById[d.id])){
+      differences[d.id] = -100;
+    }else{
+      differences[d.id] = (temperatureById[d.id] - startTemps[d.id]).toFixed(3);
+    }
+  });
+  data.features.forEach(function(d) { d.difference = differences[d.id] });
+  //console.log(differences);
+ // console.log(data.features);
   svg.append("g")
     .attr("class", "countries")
     .selectAll("path")
     .data(data.features)
     .enter().append("path")
     .attr("d", path)
-    //.style("fill", function(d) { return color(populationById[d.id]); })
+    .style("fill", function(d) { 
+      // console.log("South Africa " + color(differences['ZAF']));
+      // console.log("Mongolia: " + color(differences['MNG']))
+      if (typeof differences[d.id] === "undefined"){
+        return "rgb(255,255,255)";
+      }else{
+        return color(differences[d.id]);
+      }
+    })
     .style('stroke', 'white')
     .style('stroke-width', 1.5)
     .style("opacity", 0.8)
@@ -96,7 +152,7 @@ function ready(error, data, temperature) {
         .style("opacity", 0.8)
         .style("stroke", "white")
         .style("stroke-width", 0.3);
-    });
+    }).attr("transform", "scale(1)"); // determine if it would be better to have larger map later
 
   svg.append("path")
     .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
@@ -104,3 +160,5 @@ function ready(error, data, temperature) {
     .attr("class", "names")
     .attr("d", path);
 }
+
+
