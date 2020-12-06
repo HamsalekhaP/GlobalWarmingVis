@@ -56,7 +56,7 @@ function draw(d) {
 
   g_sea.select(".axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).ticks(5));
 
   g_sea.select(".axis--y")
     .call(d3.axisLeft(y).ticks(20));
