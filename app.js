@@ -37,7 +37,7 @@ g.append("text")
 // label "year"
 g.append("text")
   .attr("x", width)
-  .attr("y", height/2)
+  .attr("y", height-20)
   .attr("dy", "0.71em")
   .attr("text-anchor", "end") // attribute: start, middle, end
   .text("Year");
