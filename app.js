@@ -17,10 +17,10 @@ var rain_svg_margin = { top: 30, right: 20, bottom: 30, left: 40 };
 
 
 rain_svg.attr("class", "auto-width");
-rain_svg.style("height", "430");
+rain_svg.style("height", "60%");
 
 
-d3.json('./data/country_id_map.json', function (data) {
+d3.json('./data/country_id_map.json', function(data) {
   country_id_map = data;
 
   rain_bounds = rain_svg.node().getBoundingClientRect(),
@@ -64,7 +64,7 @@ d3.json('./data/country_id_map.json', function (data) {
   rain_tooltip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
-    .html(function (d) {
+    .html(function(d) {
       return "Rainfall(mm): <span>" + d.Rainfall + "</span>";
       // return " <i class='fas fa-cloud-rain' style='font-size:60px;color:red'></i><span>" + d.Rainfall + "</span>";
     });
@@ -73,23 +73,23 @@ d3.json('./data/country_id_map.json', function (data) {
 })
 
 // To DO get range from whole set or country wise??
-var rainfallDataProcessing = function (isUpdate) {
-  d3.csv('./data/rainfall.csv', function (data) {
-    var filterData = data.filter(function (d) {
+var rainfallDataProcessing = function(isUpdate) {
+  d3.csv('./data/rainfall.csv', function(data) {
+    var filterData = data.filter(function(d) {
       if (d['ISO3'] == selected_country && d['Year'] == yearOfView) {
         return d
       }
     })
     rainfallStats = filterData
 
-    rain_x.domain(filterData.map(function (d, i) {
+    rain_x.domain(filterData.map(function(d, i) {
       return d.Statistics;
     }));
 
     if (isUpdate) {
       updateBarChart(filterData)
     } else {
-      rain_y.domain([0, d3.max(filterData, function (d, i) {
+      rain_y.domain([0, d3.max(filterData, function(d, i) {
         return parseFloat(d.Rainfall);
       })]);
       drawBarChart(filterData)
@@ -112,23 +112,23 @@ function drawBarChart(r_data) {
     .enter().append("rect")
     .attr('class', 'rainfall_bar')
     .attr('width', rain_x.bandwidth())
-    .attr('x', function (d, i) {
+    .attr('x', function(d, i) {
       return rain_x(d.Statistics);
     })
     // to produce bar transition from bottom to top instead of top to bottom
-    .attr("y", function (d) {
+    .attr("y", function(d) {
       return rain_y(0);
     })
     .attr("height", 0)
     .transition()
     .duration(800)
-    .attr('y', function (d) {
+    .attr('y', function(d) {
       return rain_y(parseFloat(d.Rainfall));
     })
-    .attr('height', function (d) {
+    .attr('height', function(d) {
       return r_height - rain_y(d.Rainfall);
     })
-    .delay(function (d, i) { return (i * 50) });
+    .delay(function(d, i) { return (i * 50) });
 
 
   rain_g.selectAll('rect')
@@ -140,7 +140,7 @@ function drawBarChart(r_data) {
 rainfallDataProcessing(false)
 
 function updateBarChart(r_data) {
-  rain_y.domain([0, d3.max(r_data, function (d, i) {
+  rain_y.domain([0, d3.max(r_data, function(d, i) {
     return parseFloat(d.Rainfall);
   })]);
   rain_g.select(".axis--y")
@@ -149,19 +149,19 @@ function updateBarChart(r_data) {
   rain_g.selectAll('rect')
     .data(r_data)
     .transition()
-    .delay(function (d, i) { return i * 50; })
+    .delay(function(d, i) { return i * 50; })
     .duration(500)
-    .attr('y', function (d) {
+    .attr('y', function(d) {
       return rain_y(parseFloat(d.Rainfall));
     })
-    .attr('height', function (d) {
+    .attr('height', function(d) {
       return r_height - rain_y(d.Rainfall);
     })
 }
 
 
 
-d3.select("#mySlider").on("change", function () {
+d3.select("#mySlider").on("change", function() {
   yearOfView = this.value
   rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
 
@@ -178,13 +178,13 @@ d3.select("#mySlider").on("change", function () {
 
 var map_tip = d3.tip()
   .attr('class', 'd3-tip s')
-  .offset(function (d) {
+  .offset(function(d) {
     if (d.properties.name === "Russia") {
       // Set tooltips
       return [-10, 200]
     } else return [-10, 0]
   })
-  .html(function (d) {
+  .html(function(d) {
     if (isNaN(d.temperature)) {
       return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Temperature: </strong><span class='details'>" +
         format(d.temperature) + "<br></span>" + "<strong>Tempertature compared to 1991: </strong><span class='details'>" + format(d.difference) + "<br></span>";
@@ -217,7 +217,7 @@ queue()
 
 var map_g = map_svg.append("g")
   .attr("class", "legendThreshold")
-  .attr("transform", "translate(20,20)");
+  .attr("transform", "translate(0,20)");
 map_g.append("text")
   .attr("class", "caption")
   .attr("x", 0)
@@ -225,7 +225,7 @@ map_g.append("text")
   .text("Temperature difference (°C)");
 var map_label = ['No data', '<-1', '-1~-0.5', '-0.5~-0.1', '-0.1~0.1', '0.1~0.5', '0.5~1', '1~1.5', '1.5~2', '>2'];
 var map_legend = d3.legendColor()
-  .labels(function (d) { return map_label[d.i]; })
+  .labels(function(d) { return map_label[d.i]; })
   .shapePadding(4)
   .scale(map_color);
 map_svg.select(".legendThreshold")
@@ -245,25 +245,25 @@ function ready(error, data, temperature) {
   var startTemps = {};
   var temperatureById = {};
   var differences = {};
-  startTemp.forEach(function (d) { startTemps[d.id] = +d.temperature; })
-  filteredTemp.forEach(function (d) { temperatureById[d.id] = +d.temperature; });
-  data.features.forEach(function (d) { d.temperature = temperatureById[d.id] });
+  startTemp.forEach(function(d) { startTemps[d.id] = +d.temperature; })
+  filteredTemp.forEach(function(d) { temperatureById[d.id] = +d.temperature; });
+  data.features.forEach(function(d) { d.temperature = temperatureById[d.id] });
 
-  startTemp.forEach(function (d) {
+  startTemp.forEach(function(d) {
     if (isNaN(temperatureById[d.id])) {
       differences[d.id] = -100;
     } else {
       differences[d.id] = (temperatureById[d.id] - startTemps[d.id]).toFixed(3);
     }
   });
-  data.features.forEach(function (d) { d.difference = differences[d.id] });
+  data.features.forEach(function(d) { d.difference = differences[d.id] });
   map_svg.append("g")
     .attr("class", "countries")
     .selectAll("path")
     .data(data.features)
     .enter().append("path")
     .attr("d", path)
-    .style("fill", function (d) {
+    .style("fill", function(d) {
       if (typeof differences[d.id] === "undefined") {
         return "rgb(255,255,255)";
       } else {
@@ -276,7 +276,7 @@ function ready(error, data, temperature) {
     // tooltips
     .style("stroke", "white")
     .style('stroke-width', 0.3)
-    .on('mouseover', function (d) {
+    .on('mouseover', function(d) {
       if (d.geometry.coordinates[0][0][0][1] <= 0) {
         map_tip.direction('n').show(d);
       } else {
@@ -287,14 +287,14 @@ function ready(error, data, temperature) {
         .style("stroke", "white")
         .style("stroke-width", 3);
     })
-    .on('click', function (d) {
+    .on('click', function(d) {
       selected_country = d['id']
       rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
 
       rainfallDataProcessing(true)
 
     })
-    .on('mouseout', function (d) {
+    .on('mouseout', function(d) {
       map_tip.hide(d);
 
       d3.select(this)
@@ -303,7 +303,7 @@ function ready(error, data, temperature) {
         .style("stroke-width", 0.3);
     }).attr("transform", "scale(1)"); // determine if it would be better to have larger map later
   map_svg.append("path")
-    .datum(topojson.mesh(data.features, function (a, b) { return a.id !== b.id; }))
+    .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
     .attr("class", "names")
     .attr("d", path);
 }
@@ -352,9 +352,9 @@ g_sea.append("text")
   .text("Year");
 
 
-d3.csv("data/sealevel.csv", function (d) {
-  x.domain(d3.extent(d, function (d) { return d.Time; })); // [A, B, C, D...]
-  y.domain([0, d3.max(d, function (d, i) { return d.GMSL; })]);
+d3.csv("data/sealevel.csv", function(d) {
+  x.domain(d3.extent(d, function(d) { return d.Time; })); // [A, B, C, D...]
+  y.domain([0, d3.max(d, function(d, i) { return d.GMSL; })]);
   draw(d);
 })
 
@@ -371,8 +371,8 @@ function draw(d) {
     .call(d3.axisLeft(y).ticks(20));
 
   var line = d3.line()
-    .x(function (d, i) { return x(d.Time); })
-    .y(function (d, i) { return y(d.GMSL); })
+    .x(function(d, i) { return x(d.Time); })
+    .y(function(d, i) { return y(d.GMSL); })
 
   // g.data(d);
   // data = d
@@ -426,33 +426,33 @@ svg_co2.append("text")
   .attr("text-anchor", "end") // attribute: start, middle, end
   .text("Annual CO2 emissions by world region");
 
-  // svg_co2.append("text")
-  // .datum(function(d) {
-  //   return {
-  //     name: d.Entity,
-  //     value: d.values[d.values.length - 1]
-  //   };
-  // })
-  // .attr("transform", function(d) {
-  //   return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")";
-  // })
-  // .attr("x", 3)
-  // .attr("dy", ".35em")
-  // .text(function(d) {
-  //   return d.Entity;
-  // });
+// svg_co2.append("text")
+// .datum(function(d) {
+//   return {
+//     name: d.Entity,
+//     value: d.values[d.values.length - 1]
+//   };
+// })
+// .attr("transform", function(d) {
+//   return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")";
+// })
+// .attr("x", 3)
+// .attr("dy", ".35em")
+// .text(function(d) {
+//   return d.Entity;
+// });
 
 //Read the data
-d3.csv("data/co-demo.csv", function (data) {
+d3.csv("data/co-demo.csv", function(data) {
 
   // group the data: I want to draw one line per group
   var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
-    .key(function (d) { return d.Entity; })
+    .key(function(d) { return d.Entity; })
     .entries(data);
 
   // Add X axis --> it is a date format
   var x = d3.scaleLinear()
-    .domain(d3.extent(data, function (d) { return d.Year; }))
+    .domain(d3.extent(data, function(d) { return d.Year; }))
     .range([0, width]);
   svg_co2.append("g")
     .attr("transform", "translate(0," + height + ")")
@@ -460,13 +460,13 @@ d3.csv("data/co-demo.csv", function (data) {
 
   // Add Y axis
   var y = d3.scaleLinear()
-    .domain([0, d3.max(data, function (d) { return +d.emissions; })])
+    .domain([0, d3.max(data, function(d) { return +d.emissions; })])
     .range([height, 0]);
   svg_co2.append("g")
     .call(d3.axisLeft(y));
 
   // color palette
-  var res = sumstat.map(function (d) { return d.key }) // list of group names
+  var res = sumstat.map(function(d) { return d.key }) // list of group names
   var color_co2 = d3.scaleOrdinal()
     .domain(res)
     .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#EB2396', '#a65628', '#f781bf', '#999999'])
@@ -477,13 +477,13 @@ d3.csv("data/co-demo.csv", function (data) {
     .enter()
     .append("path")
     .attr("fill", "none")
-    .attr("stroke", function (d) { return color_co2(d.key) })
+    .attr("stroke", function(d) { return color_co2(d.key) })
     // .attr("stroke", "#63E15D")
     .attr("stroke-width", 5.5)
-    .attr("d", function (d) {
+    .attr("d", function(d) {
       return d3.line()
-        .x(function (d) { return x(d.Year); })
-        .y(function (d) { return y(+d.emissions); })
+        .x(function(d) { return x(d.Year); })
+        .y(function(d) { return y(+d.emissions); })
         (d.values)
     })
   // ------------------------------------------------------
@@ -495,21 +495,21 @@ d3.csv("data/co-demo.csv", function (data) {
 
   legend.append('rect')
     .attr('x', width - 20)
-    .attr('y', function (d, i) {
+    .attr('y', function(d, i) {
       return i * 20;
     })
     .attr('width', 10)
     .attr('height', 10)
-    .style('fill', function (d) {
+    .style('fill', function(d) {
       return color_co2(d.key);
     });
 
   legend.append('text')
     .attr('x', width - 8)
-    .attr('y', function (d, i) {
+    .attr('y', function(d, i) {
       return (i * 20) + 9;
     })
-    .text(function (d) {
+    .text(function(d) {
       return d.Entity;
     });
 

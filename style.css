@@ -34,7 +34,11 @@ body {
 }
 
 .map-wrapper {
-  height: 84vh;
+  /*height: 84vh;*/
+}
+
+.countries {
+  margin-left: 20px;
 }
 
 .names {
