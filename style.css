@@ -14,7 +14,7 @@ body {
 }
 
 .left-panel {
-  margin-top: 20px;
+  /*margin-top: 20px;*/
 }
 
 .right-panel {
@@ -35,6 +35,12 @@ body {
 
 .map-wrapper {
   /*height: 84vh;*/
+}
+
+.title {
+  text-align: center;
+  padding-bottom: 0 !important;
+
 }
 
 .countries {
@@ -133,9 +139,6 @@ body {
   border-radius: 2px;
 }
 
-.map-wrapper {
-  padding-top: 30px;
-}
 
 
 /* Tooltip CSS */

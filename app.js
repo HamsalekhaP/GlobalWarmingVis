@@ -2,6 +2,8 @@
 var format = d3.format(",");
 
 var country_id_map, rain_bounds, rain_g, rain_title, rain_tooltip, rain_x, rain_y;
+var rain_cum_bounds, rain_cum_g, rain_cum_title, rain_cum_tooltip, rain_cum_x, rain_cum_y, rain_cum_line;
+
 
 var rain_svg = d3.select('#rainfall');
 
@@ -17,7 +19,11 @@ var rain_svg_margin = { top: 30, right: 20, bottom: 30, left: 40 };
 
 
 rain_svg.attr("class", "auto-width");
-rain_svg.style("height", "60%");
+rain_svg.style("height", "46%");
+
+var rain_cum_svg = d3.select('#info-wrapper');
+rain_cum_svg.attr("class", "auto-width");
+rain_cum_svg.style("height", "47%");
 
 
 d3.json('./data/country_id_map.json', function(data) {
@@ -29,7 +35,16 @@ d3.json('./data/country_id_map.json', function(data) {
     rain_x = d3.scaleBand(),
     rain_y = d3.scaleLinear();
 
+  rain_cum_bounds = rain_cum_svg.node().getBoundingClientRect(),
+    r_cum_width = rain_cum_bounds.width - rain_svg_margin.left - rain_svg_margin.right,
+    r_cum_height = rain_cum_bounds.height - rain_svg_margin.top - rain_svg_margin.bottom,
+    rain_cum_x = d3.scaleBand(),
+    rain_cum_y = d3.scaleLinear();
+
   rain_g = rain_svg.append("g")
+    .attr("transform", "translate(" + rain_svg_margin.left + "," + rain_svg_margin.top + ")");
+
+  rain_cum_g = rain_cum_svg.append("g")
     .attr("transform", "translate(" + rain_svg_margin.left + "," + rain_svg_margin.top + ")");
 
   rain_g.append("g")
@@ -38,6 +53,11 @@ d3.json('./data/country_id_map.json', function(data) {
   rain_g.append("g")
     .attr("class", "axis axis--y");
 
+  rain_cum_g.append("g")
+    .attr("class", "c_axis c_axis--x");
+
+  rain_cum_g.append("g")
+    .attr("class", "c_axis c_axis--y");
 
   rain_title = rain_g.append("text") // Title
     .attr("x", (r_width / 2))
@@ -66,33 +86,91 @@ d3.json('./data/country_id_map.json', function(data) {
     .offset([-10, 0])
     .html(function(d) {
       return "Rainfall(mm): <span>" + d.Rainfall + "</span>";
-      // return " <i class='fas fa-cloud-rain' style='font-size:60px;color:red'></i><span>" + d.Rainfall + "</span>";
+    });
+
+
+  rain_cum_title = rain_cum_g.append("text") // Title
+    .attr("x", (r_cum_width / 2.2))
+    .attr("y", 0 - (rain_svg_margin.top / 4))
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("text-decoration", "underline")
+    .text("Distribution of Highest Rainfall in " + country_id_map[selected_country] + ' from 1991-2016');
+
+  rain_cum_g.append("text") // text label for the y axis
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - rain_svg_margin.left)
+    .attr("x", 0 - (r_cum_height / 2))
+    .attr("dx", "-.8em")
+
+    .attr("dy", "0.71em")
+    .attr('class', 'axis-label')
+    .text("Rainfall in mm");
+
+  rain_cum_g.append("text") // text label for the x axis
+    .attr("x", r_cum_width / 2)
+    .attr("y", r_cum_height + rain_svg_margin.bottom)
+    .attr("dy", ".30em")
+    .attr('class', 'axis-label')
+    .text("Year");
+
+  rain_cum_tooltip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+      return "Rainfall(mm): <span>" + d.Rainfall + "</span>";
     });
 
   rain_g.call(rain_tooltip);
+  rain_cum_g.call(rain_cum_tooltip);
 })
 
-// To DO get range from whole set or country wise??
 var rainfallDataProcessing = function(isUpdate) {
   d3.csv('./data/rainfall.csv', function(data) {
-    var filterData = data.filter(function(d) {
-      if (d['ISO3'] == selected_country && d['Year'] == yearOfView) {
+    var country_filterData = data.filter(function(d) {
+      if (d['ISO3'] == selected_country) {
         return d
       }
     })
+    cum_year_filterData = {}
+    country_filterData.forEach(function(d) {
+      if (!cum_year_filterData[d.Year]) {
+        cum_year_filterData[d.Year] = d
+      } else {
+        cum_year_filterData[d.Year] = parseInt(d.Rainfall) > parseInt(cum_year_filterData[d.Year].Rainfall) ? d : cum_year_filterData[d.Year]
+      }
+    })
+    cum_year_filterData = Object.values(cum_year_filterData)
+
+    var filterData = country_filterData.filter(function(d) {
+      if (d['Year'] == yearOfView) {
+        return d
+      }
+    })
+
     rainfallStats = filterData
 
     rain_x.domain(filterData.map(function(d, i) {
       return d.Statistics;
     }));
+    rain_cum_x.domain(cum_year_filterData.map(function(d, i) {
+      return d.Year;
+    }));
 
     if (isUpdate) {
       updateBarChart(filterData)
+      updateLineChart(cum_year_filterData)
     } else {
       rain_y.domain([0, d3.max(filterData, function(d, i) {
         return parseFloat(d.Rainfall);
       })]);
+
+      rain_cum_y.domain([0, d3.max(cum_year_filterData, function(d, i) {
+        return parseFloat(d.Rainfall);
+      })]);
+
       drawBarChart(filterData)
+      drawLineChart(cum_year_filterData)
     }
   })
 };
@@ -137,6 +215,62 @@ function drawBarChart(r_data) {
 
 }
 
+function drawLineChart(cr_data) {
+  rain_cum_x.rangeRound([0, r_cum_width]);
+  rain_cum_y.rangeRound([r_cum_height, 0]);
+  // rain_cum_x.padding([0.2]);
+  rain_cum_g.select(".c_axis--x")
+    .attr("transform", "translate(0," + r_cum_height + ")")
+    .call(d3.axisBottom(rain_cum_x))
+    .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-65)");
+  rain_cum_g.select(".c_axis--y")
+    .call(d3.axisLeft(rain_cum_y));
+  rain_cum_line = d3.line()
+    .x(function(d, i) { return rain_cum_x(d.Year); })
+    .y(function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)); })
+
+  rain_cum_g.data(cr_data);
+  data = cr_data
+  rain_cum_g.append("path")
+    .datum(cr_data)
+    .attr("class", "rain_line")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 3)
+    .attr("fill", "none")
+    .attr("d", rain_cum_line);
+
+  rain_cum_g.selectAll(".dot")
+    .data(cr_data)
+    .enter().append("circle")
+    .attr("class", "dot")
+    .attr("cx", function(d, i) { return rain_cum_x(d.Year) })
+    .attr("cy", function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)) })
+    .attr("r", 3)
+    .on("mouseover", rain_cum_tooltip.show)
+    .on("mouseout", rain_cum_tooltip.hide)
+  // .on("mouseover", function(d) {
+  //   div.transition()
+  //     .duration(200)
+  //     .style("opacity", .9);
+  //   div.html((d.Year) + ":" + d.frequency)
+  //     .style("left", (d3.event.pageX) + "px")
+  //     .style("top", (d3.event.pageY - 28) + "px");
+  // })
+  // .on("mouseout", function(d) {
+  //   div.transition()
+  //     .duration(500)
+  //     .style("opacity", 0);
+  // });
+  // rain_cum_g.selectAll('rect')
+  //   .on("mouseover", rain_cum_tooltip.show)
+  //   .on("mouseout", rain_cum_tooltip.hide)
+
+}
+
 rainfallDataProcessing(false)
 
 function updateBarChart(r_data) {
@@ -157,6 +291,54 @@ function updateBarChart(r_data) {
     .attr('height', function(d) {
       return r_height - rain_y(d.Rainfall);
     })
+
+}
+
+function updateLineChart(cr_data) {
+  rain_cum_y.domain([0, d3.max(cr_data, function(d, i) {
+    return parseFloat(d.Rainfall);
+  })]);
+  rain_cum_g.select(".c_axis--y")
+    .call(d3.axisLeft(rain_cum_y));
+
+  // rain_cum_line = d3.line()
+  //   .x(function(d, i) { return rain_cum_x(d.Year); })
+  //   .y(function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)); })
+
+  // rain_cum_g.data(cr_data);
+  // data = cr_data
+  // rain_cum_g.append("path")
+  //   .datum(cr_data)
+  //   .attr("class", "linelineline")
+  //   .attr("stroke", "steelblue")
+  //   .attr("stroke-width", 3)
+  //   .attr("fill", "none")
+  //   .attr("d", rain_cum_line);
+
+  // rain_cum_g.selectAll(".dot")
+  //   .data(cr_data)
+  //   .enter().append("circle")
+  //   .attr("class", "dot")
+  //   .attr("cx", function(d, i) { return rain_cum_x(d.Year) })
+  //   .attr("cy", function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)) })
+  //   .attr("r", 3)
+  rain_cum_svg.select(".rain_line")
+    .datum(cr_data)
+    .transition()
+    .delay(function(d, i) { return i * 50; })
+    .duration(1000)
+    .attr("d", rain_cum_line);
+
+  rain_cum_svg.selectAll(".dot")
+    .data(cr_data)
+    .transition()
+    .delay(function(d, i) { return i * 50; })
+    .duration(1000)
+    .attr("cx", function(d, i) { return rain_cum_x(d.Year) })
+    .attr("cy", function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)) })
+    .attr("r", 3)
+    .on("mouseover", rain_cum_tooltip.show)
+    .on("mouseout", rain_cum_tooltip.hide)
 }
 
 
@@ -174,6 +356,10 @@ d3.select("#mySlider").on("change", function() {
     .defer(d3.csv, "country_avg_temp.csv")
     .await(ready);
 });
+
+
+
+
 // Code for Rainfall graph ends here
 
 var map_tip = d3.tip()
@@ -290,7 +476,7 @@ function ready(error, data, temperature) {
     .on('click', function(d) {
       selected_country = d['id']
       rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
-
+      rain_cum_title.text("Rainfall Distribution in " + country_id_map[selected_country]);
       rainfallDataProcessing(true)
 
     })
