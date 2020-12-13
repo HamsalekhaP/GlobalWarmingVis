@@ -1,4 +1,3 @@
-To do
-package manager - npm or webpack integration
-hosting config
+### Global Warming Infographics
 
+Time and again, humans have shown complete disregard to the conservation of Earth. The direct effect of this is global warming, which can be observed as the long-term warming of the planet. This trend has significantly increased in the last hundred years and has been predicted to have severe implications. It has caused what is today one of the most critical problems of all times, climate change! It refers to the change in weather patterns over the years across the globe and rise in sea level caused by melting of glaciers which ultimately poses serious threat to life forms on the planet. One of the primary causes of global warming is the increase in levels of greenhouse gases in the atmosphere caused by burning fossil fuels. We aim to spread awareness about how the situation has worsened in the past 25 years through a system that provides statistics related to climate change, ie., the cause and effect of global warming in the form of a dashboard.
