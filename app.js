@@ -321,8 +321,8 @@ d3.select("#mySlider").on("change", function() {
   selectedValue = this.value
   yearOfView = selectedValue
   queue()
-    .defer(d3.json, "world_countries.json")
-    .defer(d3.csv, "country_avg_temp.csv")
+    .defer(d3.json, "data/world_countries.json")
+    .defer(d3.csv, "data/country_avg_temp.csv")
     .await(ready);
 });
 
@@ -366,8 +366,8 @@ var projection = d3.geoMercator().scale(100)
 var path = d3.geoPath().projection(projection);
 map_svg.call(map_tip);
 queue()
-  .defer(d3.json, "world_countries.json")
-  .defer(d3.csv, "country_avg_temp.csv")
+  .defer(d3.json, "data/world_countries.json")
+  .defer(d3.csv, "data/country_avg_temp.csv")
   .await(ready);
 
 var map_g = map_svg.append("g")
@@ -528,7 +528,7 @@ function draw(d) {
 
   g_sea.select(".axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).ticks(8));
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
   g_sea.select(".axis--y")
     .call(d3.axisLeft(y).ticks(20));
@@ -629,7 +629,7 @@ d3.csv("data/co-demo.csv", function(data) {
     .range([0, width]);
   svg_co2.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).ticks(5));
+    .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format("d")));
 
   // Add Y axis
   var y = d3.scaleLinear()
