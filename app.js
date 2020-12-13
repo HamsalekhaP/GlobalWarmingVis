@@ -331,8 +331,8 @@ d3.select("#mySlider").on("change", function() {
   selectedValue = this.value
   yearOfView = selectedValue
   queue()
-    .defer(d3.json, "world_countries.json")
-    .defer(d3.csv, "country_avg_temp.csv")
+    .defer(d3.json, "data/world_countries.json")
+    .defer(d3.csv, "data/country_avg_temp.csv")
     .await(ready);
 });
 
@@ -376,8 +376,8 @@ var projection = d3.geoMercator().scale(100)
 var path = d3.geoPath().projection(projection);
 map_svg.call(map_tip);
 queue()
-  .defer(d3.json, "world_countries.json")
-  .defer(d3.csv, "country_avg_temp.csv")
+  .defer(d3.json, "data/world_countries.json")
+  .defer(d3.csv, "data/country_avg_temp.csv")
   .await(ready);
 
 var map_g = map_svg.append("g")
