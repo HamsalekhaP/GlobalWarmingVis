@@ -537,6 +537,16 @@ g_sea.append("text")
   .attr("text-anchor", "end") // attribute: start, middle, end
   .text("Year");
 
+// Heading
+g_sea.append("text")
+  .attr("x", width-10)
+  .attr("y", -10)
+  .attr("dy", "0.71em")
+  .attr("text-anchor", "end") // attribute: start, middle, end
+  .style("font-size", "14px")
+  .style("text-decoration", "underline")
+  .text("Global Sea Level from 1994 to 2014");
+
 
 d3.csv("data/sealevel.csv", function(d) {
   x.domain(d3.extent(d, function(d) { return d.Time; })); // [A, B, C, D...]
@@ -612,6 +622,16 @@ svg_co2.append("text")
   .attr("text-anchor", "end") // attribute: start, middle, end
   .text("Annual CO2 emissions by world region");
 
+// Heading
+svg_co2.append("text")
+  .attr("x", width-10)
+  .attr("y", -10)
+  .attr("dy", "0.71em")
+  .attr("text-anchor", "end") // attribute: start, middle, end
+  .style("font-size", "14px")
+  .style("text-decoration", "underline")
+  .text("CO2 Emissions from 1990 to 2018");
+
 // svg_co2.append("text")
 // .datum(function(d) {
 //   return {
@@ -680,7 +700,7 @@ d3.csv("data/co-demo.csv", function(data) {
 
   svg_co2.append("g")
     .attr("class", "legendOrdinal")
-    .attr("transform", "translate(40,5)");
+    .attr("transform", "translate(40,15)");
 
   var legendOrdinal = d3.legendColor()
     //d3 symbol creates a path-string, for example
