@@ -673,31 +673,27 @@ d3.csv("data/co-demo.csv", function(data) {
         (d.values)
     })
   // ------------------------------------------------------
-  var legend = svg_co2.selectAll('g')
-    .data(sumstat)
-    .enter()
-    .append('g')
-    .attr('class', 'legend');
+  // Legend 
+  var ordinal = d3.scaleOrdinal()
+    .domain(["Asia", "China", "US", "India", "South America", "North America", "Europe", "Africa"])
+    .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#a65628', '#f781bf', '#ff7f00', '#EB2396']);
 
-  legend.append('rect')
-    .attr('x', width - 20)
-    .attr('y', function(d, i) {
-      return i * 20;
-    })
-    .attr('width', 10)
-    .attr('height', 10)
-    .style('fill', function(d) {
-      return color_co2(d.key);
-    });
+  svg_co2.append("g")
+    .attr("class", "legendOrdinal")
+    .attr("transform", "translate(40,5)");
 
-  legend.append('text')
-    .attr('x', width - 8)
-    .attr('y', function(d, i) {
-      return (i * 20) + 9;
-    })
-    .text(function(d) {
-      return d.Entity;
-    });
+  var legendOrdinal = d3.legendColor()
+    //d3 symbol creates a path-string, for example
+    //"M0,-8.059274488676564L9.306048591020996,
+    //8.059274488676564 -9.306048591020996,8.059274488676564Z"
+    .shape("path", d3.symbol().type(d3.symbolTriangle).size(100)())
+    .shapePadding(5)
+    //use cellFilter to hide the "e" cell
+    .cellFilter(function (d) { return d.label !== "e" })
+    .scale(ordinal);
+
+  svg_co2.select(".legendOrdinal")
+    .call(legendOrdinal);
 
   // var mouseG = svg_co2.append("g")
   //   .attr("class", "mouse-over-effects");
