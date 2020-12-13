@@ -301,27 +301,6 @@ function updateLineChart(cr_data) {
   rain_cum_g.select(".c_axis--y")
     .call(d3.axisLeft(rain_cum_y));
 
-  // rain_cum_line = d3.line()
-  //   .x(function(d, i) { return rain_cum_x(d.Year); })
-  //   .y(function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)); })
-
-  // rain_cum_g.data(cr_data);
-  // data = cr_data
-  // rain_cum_g.append("path")
-  //   .datum(cr_data)
-  //   .attr("class", "linelineline")
-  //   .attr("stroke", "steelblue")
-  //   .attr("stroke-width", 3)
-  //   .attr("fill", "none")
-  //   .attr("d", rain_cum_line);
-
-  // rain_cum_g.selectAll(".dot")
-  //   .data(cr_data)
-  //   .enter().append("circle")
-  //   .attr("class", "dot")
-  //   .attr("cx", function(d, i) { return rain_cum_x(d.Year) })
-  //   .attr("cy", function(d, i) { return rain_cum_y(parseFloat(d.Rainfall)) })
-  //   .attr("r", 3)
   rain_cum_svg.select(".rain_line")
     .datum(cr_data)
     .transition()
@@ -476,7 +455,7 @@ function ready(error, data, temperature) {
     .on('click', function(d) {
       selected_country = d['id']
       rain_title.text("Rainfall Distribution in year " + yearOfView + " in " + country_id_map[selected_country]);
-      rain_cum_title.text("Rainfall Distribution in " + country_id_map[selected_country]);
+      rain_cum_title.text("Distribution of Highest Rainfall in " + country_id_map[selected_country] + " from 1991-2016");
       rainfallDataProcessing(true)
 
     })
@@ -709,7 +688,7 @@ d3.csv("data/co-demo.csv", function(data) {
     .shape("path", d3.symbol().type(d3.symbolTriangle).size(100)())
     .shapePadding(5)
     //use cellFilter to hide the "e" cell
-    .cellFilter(function (d) { return d.label !== "e" })
+    .cellFilter(function(d) { return d.label !== "e" })
     .scale(ordinal);
 
   svg_co2.select(".legendOrdinal")
